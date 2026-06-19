@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAZZAR · Финмодель 2026</title>
+<style>
+:root{
+  --bg:#120F18;
+  --surface:#1C1726;
+  --surface-2:#241D33;
+  --surface-3:#2D2440;
+  --border:rgba(255,255,255,0.10);
+  --border-soft:rgba(255,255,255,0.06);
+  --text:#F3EFFA;
+  --text-dim:#9C92B3;
+  --text-faint:#6F6587;
+  --gold:#E3AE3F;
+  --gold-dim:rgba(227,174,63,0.16);
+  --teal:#49B6A8;
+  --teal-dim:rgba(73,182,168,0.16);
+  --rose:#E2587C;
+  --rose-dim:rgba(226,88,124,0.16);
+  --green:#5FCB8B;
+  --sc-base:#5FCB8B;
+  --sc-moderate:#E8C547;
+  --sc-critical:#E2587C;
+  --radius:14px;
+  --radius-sm:8px;
+  --font-display:'Arial Narrow', Arial, sans-serif;
+  --font-body:-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono:ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg);
+  background-image: radial-gradient(circle at 12% -10%, rgba(227,174,63,0.07), transparent 45%),
+                     radial-gradient(circle at 90% 0%, rgba(226,88,124,0.06), transparent 40%);
+  color:var(--text);
+  font-family:var(--font-body);
+  min-height:100vh;
+}
+.mono{font-family:var(--font-mono);}
+.display{font-family:var(--font-display); font-weight:700; text-transform:uppercase; letter-spacing:0.04em;}
+
+header.topbar{
+  position:sticky; top:0; z-index:50;
+  background:rgba(18,15,24,0.95);
+  border-bottom:1px solid var(--border);
+  padding:14px 24px;
+  display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+}
+.brand{display:flex; align-items:baseline; gap:10px;}
+.brand .logo{font-family:var(--font-display); font-weight:700; font-size:24px; letter-spacing:0.08em; color:var(--text); text-transform:uppercase;}
+.brand .logo span{color:var(--gold);}
+.brand .sub{font-size:11px; color:var(--text-faint); letter-spacing:0.1em; text-transform:uppercase;}
+.tabs{display:flex; gap:6px; background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:4px;}
+.tab-btn{appearance:none; border:none; background:transparent; color:var(--text-dim); font-weight:600; font-size:13px; padding:9px 18px; border-radius:999px; cursor:pointer; transition:all .15s ease;}
+.tab-btn.active{background:var(--gold); color:#1A1408;}
+.tab-btn:not(.active):hover{color:var(--text);}
+.spacer{flex:1;}
+.op-pill{font-family:var(--font-mono); font-size:11px; padding:5px 10px; border-radius:6px; font-weight:600; border:1px solid var(--border);}
+.op-pill.on{background:var(--teal-dim); color:var(--teal); border-color:transparent;}
+.op-pill.off{background:var(--rose-dim); color:var(--rose); border-color:transparent;}
+
+main{max-width:1360px; margin:0 auto; padding:24px;}
+.view{display:none;}
+.view.active{display:block;}
+
+.layout{display:grid; grid-template-columns:330px 1fr; gap:22px; align-items:start;}
+@media (max-width:920px){.layout{grid-template-columns:1fr;}}
+
+.panel{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:18px; position:sticky; top:84px; max-height:calc(100vh - 100px); overflow-y:auto;
+}
+@media (max-width:920px){.panel{position:static; max-height:none;}}
+.panel-top-toggle{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-sm);
+  padding:12px 14px; margin-bottom:16px;
+}
+.panel-top-toggle .lbl{font-size:12.5px; font-weight:600; color:var(--text);}
+.panel-top-toggle .sub{font-size:10.5px; color:var(--text-faint); margin-top:2px;}
+.switch{position:relative; width:44px; height:24px; border-radius:999px; background:var(--surface-3); border:1px solid var(--border); cursor:pointer; flex-shrink:0; transition:background .2s ease;}
+.switch.on{background:var(--gold);}
+.switch .knob{position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#100D16; transition:left .2s ease;}
+.switch.on .knob{left:22px; background:#1A1408;}
+
+details.pgroup{border-bottom:1px solid var(--border-soft); margin-bottom:4px;}
+details.pgroup summary{
+  list-style:none; cursor:pointer; padding:10px 2px; font-family:var(--font-display); font-weight:700;
+  font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-faint);
+  display:flex; align-items:center; gap:6px;
+}
+details.pgroup summary::-webkit-details-marker{display:none;}
+details.pgroup summary::before{content:'▸'; font-size:10px; transition:transform .15s ease;}
+details.pgroup[open] summary::before{transform:rotate(90deg);}
+details.pgroup summary:hover{color:var(--gold);}
+
+.control{margin:10px 2px 16px;}
+.control .row{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px; gap:8px;}
+.control label{font-size:12.5px; color:var(--text-dim); font-weight:500; line-height:1.3;}
+.control .val{font-family:var(--font-mono); font-size:12.5px; font-weight:600; color:var(--gold); white-space:nowrap;}
+.control .val.neg{color:var(--rose);}
+input[type=range]{width:100%; -webkit-appearance:none; height:5px; border-radius:3px; background:var(--surface-3); outline:none; cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:15px; height:15px; border-radius:50%; background:var(--gold); cursor:pointer; border:2px solid #120F18;}
+input[type=range]::-moz-range-thumb{width:15px; height:15px; border-radius:50%; background:var(--gold); border:2px solid #120F18; cursor:pointer;}
+input[type=range]:disabled{opacity:0.4; cursor:not-allowed;}
+input[type=number]{
+  width:100%; background:var(--surface-3); border:1px solid var(--border); border-radius:6px;
+  color:var(--text); font-family:var(--font-mono); font-size:12.5px; padding:7px 9px;
+}
+.reset-btn{width:100%; padding:10px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--surface-2); color:var(--text-dim); font-weight:600; font-size:12px; cursor:pointer; text-transform:uppercase; letter-spacing:0.04em; margin-top:6px;}
+.reset-btn:hover{border-color:var(--gold); color:var(--gold);}
+.hint{font-size:11px; color:var(--text-faint); line-height:1.5; margin-top:14px; padding-top:14px; border-top:1px solid var(--border-soft);}
+
+.month-grid-label{font-size:12.5px; color:var(--text-dim); font-weight:500; margin-bottom:8px; display:block;}
+.month-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:16px;}
+@media (max-width:1040px) and (min-width:921px){.month-grid{grid-template-columns:repeat(7,1fr);}}
+.month-cell{display:flex; flex-direction:column; gap:4px;}
+.month-cell .mlbl{font-size:10px; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.04em;}
+.month-cell input[type=number]{padding:6px 7px; font-size:11.5px;}
+.anchor-row{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;}
+.anchor-cell .mlbl{font-size:11px; color:var(--text-faint); margin-bottom:6px; display:block;}
+
+.chart-tooltip{
+  position:fixed; pointer-events:none; z-index:200; background:#0E0B14; border:1px solid var(--border);
+  border-radius:8px; padding:8px 11px; font-family:var(--font-mono); font-size:11.5px; color:var(--text);
+  box-shadow:0 8px 24px rgba(0,0,0,0.45); opacity:0; transition:opacity .08s ease; max-width:220px; line-height:1.5;
+}
+.chart-tooltip.show{opacity:1;}
+.chart-tooltip .tt-title{color:var(--text-faint); font-size:10px; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:3px;}
+
+.fact-badge{display:inline-block; font-size:8.5px; padding:1px 5px; border-radius:4px; margin-top:3px; text-transform:uppercase; letter-spacing:0.03em;}
+.fact-badge.is-fact{background:rgba(156,146,179,0.22); color:var(--text-dim);}
+.fact-badge.is-plan{background:var(--gold-dim); color:var(--gold);}
+th.fact-col{background:rgba(156,146,179,0.08);}
+td.fact-col{background:rgba(156,146,179,0.06);}
+th.plan-col{background:rgba(227,174,63,0.05);}
+td.plan-col{background:rgba(227,174,63,0.035);}
+
+.kpi-row{display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:20px;}
+@media (max-width:1100px){.kpi-row{grid-template-columns:repeat(2,1fr);}}
+.kpi{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px;}
+.kpi .eyebrow{font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-faint); margin-bottom:7px;}
+.kpi .num{font-family:var(--font-mono); font-size:19px; font-weight:600; color:var(--text);}
+.kpi .delta{font-size:10.5px; margin-top:5px; font-family:var(--font-mono);}
+.delta.pos{color:var(--green);} .delta.neg{color:var(--rose);} .delta.flat{color:var(--text-faint);}
+
+.card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:18px;}
+.card .title{font-family:var(--font-display); font-size:13px; letter-spacing:0.07em; text-transform:uppercase; color:var(--text-dim); margin:0 0 14px;}
+.chart-wrap{width:100%;}
+.chart-wrap svg{width:100%; height:auto; display:block;}
+.legend-row{display:flex; gap:16px; flex-wrap:wrap; font-size:11px; color:var(--text-dim); margin-top:10px;}
+.legend-dot{display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:6px; vertical-align:middle;}
+
+table{width:100%; border-collapse:collapse; font-size:12.5px;}
+th,td{padding:8px 9px; text-align:right; border-bottom:1px solid var(--border-soft);}
+th:first-child, td:first-child{text-align:left; color:var(--text-dim);}
+thead th{font-size:10px; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-faint); font-weight:600; border-bottom:1px solid var(--border);}
+tbody tr.group-total td{font-weight:700; color:var(--text); border-top:1px solid var(--border);}
+tbody tr.sub-faint td{color:var(--text-faint); font-size:11.5px;}
+td.num, th.num{font-family:var(--font-mono);}
+.fact-col{background:rgba(255,255,255,0.025);}
+
+.sc-toolbar{display:flex; align-items:center; gap:12px; margin-bottom:18px; flex-wrap:wrap;}
+.sc-toolbar label{font-size:12px; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.07em;}
+select#scenarioSelect{
+  background:var(--surface); border:1px solid var(--border); color:var(--text); font-family:var(--font-body);
+  font-weight:600; font-size:14px; padding:10px 14px; border-radius:var(--radius-sm); cursor:pointer; min-width:220px;
+}
+.scenario-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:20px; position:relative; overflow:hidden;}
+.scenario-card::before{content:''; position:absolute; top:0; left:0; right:0; height:3px;}
+.scenario-card.c-base::before{background:var(--sc-base);}
+.scenario-card.c-moderate::before{background:var(--sc-moderate);}
+.scenario-card.c-critical::before{background:var(--sc-critical);}
+.scenario-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;}
+.scenario-name{font-family:var(--font-display); font-size:17px; letter-spacing:0.05em; text-transform:uppercase;}
+.c-base .scenario-name{color:var(--sc-base);} .c-moderate .scenario-name{color:var(--sc-moderate);} .c-critical .scenario-name{color:var(--sc-critical);}
+.chip{font-family:var(--font-mono); font-size:10px; padding:3px 9px; border-radius:5px; border:1px solid var(--border); color:var(--text-faint);}
+.sc-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+@media (max-width:760px){.sc-grid{grid-template-columns:1fr;}}
+.sc-control{margin-bottom:14px;}
+.sc-control .row{display:flex; justify-content:space-between; margin-bottom:6px;}
+.sc-control label{font-size:12.5px; color:var(--text-dim);}
+.sc-control .val{font-family:var(--font-mono); font-size:12.5px; font-weight:600;}
+.c-base .val{color:var(--sc-base);} .c-moderate .val{color:var(--sc-moderate);} .c-critical .val{color:var(--sc-critical);}
+.c-base input[type=range]::-webkit-slider-thumb{background:var(--sc-base);}
+.c-moderate input[type=range]::-webkit-slider-thumb{background:var(--sc-moderate);}
+.c-critical input[type=range]::-webkit-slider-thumb{background:var(--sc-critical);}
+.sc-kpis{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
+.sc-kpi{background:var(--surface-2); border:1px solid var(--border-soft); border-radius:10px; padding:12px 14px;}
+.sc-kpi .eyebrow{font-size:9.5px; letter-spacing:0.07em; text-transform:uppercase; color:var(--text-faint); margin-bottom:6px;}
+.sc-kpi .num{font-family:var(--font-mono); font-size:16px; font-weight:600;}
+.sc-kpi .sub{font-size:10.5px; color:var(--text-faint); margin-top:4px; font-family:var(--font-mono);}
+.locked-note{font-size:11px; color:var(--text-faint); margin-top:8px;}
+
+.compare-table td.col-base, th.col-base{color:var(--sc-base);}
+.compare-table td.col-moderate, th.col-moderate{color:var(--sc-moderate);}
+.compare-table td.col-critical, th.col-critical{color:var(--sc-critical);}
+</style>
+</head>
+<body>
+<div class="chart-tooltip" id="chartTooltip"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">BAZZAR<span>·</span>2026</div>
+    <div class="sub">Финмодель / Сценарный инструмент</div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="tab1">Общий интерфейс</button>
+    <button class="tab-btn" data-tab="tab2">Сценарии</button>
+    <button class="tab-btn" data-tab="tab3">2025 vs 2026</button>
+  </div>
+  <div class="spacer"></div>
+  <div class="op-pill on" id="opPillHeader">ОП: ВКЛ</div>
+</header>
+
+<main>
+
+  <!-- ============ TAB 1 ============ -->
+  <section class="view active" id="tab1">
+    <div class="layout">
+
+      <div class="panel">
+        <div class="panel-top-toggle">
+          <div>
+            <div class="lbl">Отдел продаж (ОП)</div>
+            <div class="sub">Столы, мероприятия, их ФОТ и комиссии</div>
+          </div>
+          <div class="switch on" id="opSwitch"><div class="knob"></div></div>
+        </div>
+        <div id="paramGroups"></div>
+        <button class="reset-btn" id="resetBtn">Вернуть все к плану</button>
+        <div class="hint">Январь–май — факт, не пересчитывается. Все параметры применяются только к плану июнь–декабрь. Показатели ниже операционной прибыли (премии, % ГД и т.д.) в этом инструменте не учитываются.</div>
+      </div>
+
+      <div class="content">
+        <div class="kpi-row" id="kpiRow"></div>
+
+        <div class="card">
+          <div class="title">Выручка по месяцам — структура и маржа</div>
+          <div class="chart-wrap" id="revenueChart"></div>
+        </div>
+
+        <div class="card">
+          <div class="title">Прибыль по месяцам</div>
+          <div class="chart-wrap" id="profitChart"></div>
+        </div>
+
+        <div class="card">
+          <div class="title">P&L по основным группам, помесячно</div>
+          <div style="overflow-x:auto;"><table id="plTable"></table></div>
+          <div class="legend-row"><span><span class="legend-dot" style="background:var(--text-dim)"></span>янв–май — факт</span><span><span class="legend-dot" style="background:var(--gold)"></span>июн–дек — план</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB 2 ============ -->
+  <section class="view" id="tab2">
+
+    <div class="sc-toolbar">
+      <label>Редактировать сценарий:</label>
+      <select id="scenarioSelect">
+        <option value="base">Базовый</option>
+        <option value="moderate" selected>Умеренное падение</option>
+        <option value="critical">Критичное падение</option>
+      </select>
+    </div>
+
+    <div id="scenarioEditor"></div>
+
+    <div class="card">
+      <div class="title">Сравнение сценариев — итого за 2026 год</div>
+      <div style="overflow-x:auto;"><table class="compare-table" id="compareTable"></table></div>
+    </div>
+
+    <div class="card">
+      <div class="title">Помесячная динамика выручки по сценариям</div>
+      <div class="chart-wrap" id="scenarioRevChart"></div>
+    </div>
+
+    <div class="card">
+      <div class="title">Помесячная динамика операционной прибыли по сценариям</div>
+      <div class="chart-wrap" id="scenarioOpChart"></div>
+    </div>
+  </section>
+
+  <!-- ============ TAB 3 ============ -->
+  <section class="view" id="tab3">
+    <div class="kpi-row" id="kpiRow3"></div>
+
+    <div class="card">
+      <div class="title">Выручка по месяцам — 2025 факт vs 2026 (текущие настройки)</div>
+      <div class="chart-wrap" id="revCompareChart"></div>
+      <div class="legend-row" id="revCompareLegend"></div>
+    </div>
+
+    <div class="card">
+      <div class="title">Операционная прибыль по месяцам — 2025 факт vs 2026</div>
+      <div class="chart-wrap" id="opCompareChart"></div>
+      <div class="legend-row" id="opCompareLegend"></div>
+    </div>
+
+    <div class="card">
+      <div class="title">Сравнение по группам статей — итого за год</div>
+      <div style="overflow-x:auto;"><table class="compare-table" id="year2525Table"></table></div>
+      <div class="hint" style="margin-top:10px; padding-top:10px;">2026 берётся с текущими значениями из вкладки «Общий интерфейс» (живая привязка — поменяешь там параметры, тут тоже пересчитается). «ФОТ» объединяет линейный персонал и АУП (включая коммерческий отдел) — так нивелируется разница в категоризации между годами. % от ТО — доля статьи от выручки своего года.</div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+const BASE = {"guests": [6851, 5597, 6748, 7765, 13087, 13000, 13103, 15513, 10727, 9888, 11196, 12628], "check": [1886, 1719, 1558, 1660, 1595, 1624, 1706, 1791, 1660, 1743, 1830, 2105], "revenue": [12922356, 9618836, 10510415, 12886406, 20963343, 21117200, 22348739, 27782247, 17806820, 17234784, 20490359, 26577804], "bar": [11093233, 7900817, 8594660, 10290931, 16065180, 13072660, 14132891, 18179698, 11082256, 10313827, 13154088, 17175343], "entrance": [1829123, 1718019, 1915755, 2595475, 4805575, 4223440, 4469748, 5556449, 3561364, 3446957, 4098072, 5315561], "tables": [0, 0, 0, 0, 0, 1871100, 1871100, 1871100, 1663200, 2079000, 1663200, 2286900], "events": [0, 0, 0, 0, 92588, 1950000, 1875000, 2175000, 1500000, 1395000, 1575000, 1800000], "fot_lineyka": [1083740, 700949, 933126, 859024, 1565691, 1565691, 1565691, 1565691, 1565691, 1330838, 1330838, 1463921], "cogs_total": [3684942, 2685676, 3294345, 3632307, 5393734, 6584780, 6837940, 7980110, 5876142, 5522263, 6202464, 7616974], "gross_profit": [9237414, 6933160, 7216070, 9254099, 15569609, 14532420, 15510799, 19802137, 11930678, 11712521, 14287895, 18960830], "indirect_total": [4591708, 3772671, 4018408, 4707844, 6288512, 7696120, 8022478, 9462358, 6818869, 6667280, 7530007, 9143180], "pretax_profit": [4645706, 3160489, 3197662, 4546255, 9281097, 6836300, 7488321, 10339780, 5111809, 5045242, 6757888, 9817650], "taxes_total": [834478, 696469, 832412, 895598, 1417110, 1312505, 1368771, 1597459, 1187905, 1129730, 1279634, 1533262], "operating_profit": [3811228, 2464020, 2365250, 3650657, 7863987, 5523795, 6119550, 8742321, 3923904, 3915512, 5478254, 8284388], "net_profit": [3382555, 2116179, 2023335, 3231617, 7192147, 4992368, 5552377, 8017782, 3488470, 3480581, 4949559, 7587325], "fact_postoyannye": [90192, 85941, 96981, 94881, 156881], "fact_taxi": [128675, 107328, 151845, 76926, 171792], "fact_po": [55058, 85368, 69218, 89318, 161343], "fact_vnebudget": [207741, 182648, 221225, 258052, 689463], "fact_ekvayring": [257220, 227541, 220340, 274389, 382853], "fact_aupKlub": [402708, 193499, 236365, 414060, 511010], "fact_commerceDept": [614700, 506500, 436776, 512400, 463552], "fact_gd": [258447, 288565, 210208, 257728, 419267], "fact_finotdel": [350000, 350000, 350000, 350000, 400000], "fact_housemaster": [30000, 30000, 37500, 30000, 30000], "fact_kpi": [0, 0, 0, 0, 0], "fact_podbor": [14259, 16922, 30681, 172960, 107890], "fact_fondy": [20000, 20000, 150000, 170000, 250000], "fact_commercialTotal": [2062708, 1578359, 1707269, 1907130, 2434461]};
+
+const MONTHS = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+const FACT_COUNT = 5;
+
+/* ============ PARAMETER DEFINITIONS (every model input) ============ */
+const PARAM_DEFS = [
+ {key:'guestPct', label:'Гости, % к плану', group:'Выручка', type:'pct', min:-40, max:15, step:1, def:0},
+ {key:'checkPct', label:'Средний чек, % к плану', group:'Выручка', type:'pct', min:-30, max:15, step:1, def:0},
+ {key:'entrancePct', label:'Доля «вход» от выручки', group:'Выручка', type:'pct', min:10, max:30, step:1, def:20},
+
+ {key:'zakupPct', label:'Закуп, % от выручки', group:'Себестоимость', type:'pct', min:15, max:35, step:0.5, def:20},
+ {key:'arenda', label:'Аренда, ₽/мес', group:'Себестоимость', type:'fixed', step:10000, def:500000},
+ {key:'komunalka', label:'Коммуналка, ₽/мес', group:'Себестоимость', type:'fixed', step:5000, def:30000},
+ {key:'fotLineykaPct', label:'ФОТ «линейка» (бар-персонал), % к плану', group:'Себестоимость', type:'pct', min:-30, max:30, step:1, def:0},
+ {key:'pctLineykaRate', label:'% премии «линейки» от выручки бара', group:'Себестоимость', type:'pct', min:0, max:5, step:0.1, def:1},
+ {key:'commTablesRate', label:'% комиссии ОП со столов', group:'Себестоимость', type:'pct', min:0, max:10, step:0.5, def:2},
+ {key:'commEventsRate', label:'% комиссии ОП с мероприятий', group:'Себестоимость', type:'pct', min:0, max:15, step:0.5, def:5},
+
+ {key:'ekvayringPct', label:'Эквайринг, % от выручки', group:'Косвенные расходы', type:'pct', min:0, max:5, step:0.1, def:2},
+ {key:'fondyPct', label:'Фонды (адм.), % от выручки', group:'Косвенные расходы', type:'pct', min:0, max:5, step:0.1, def:1.5},
+ {key:'kpiPct', label:'Премия KPI, % от выручки', group:'Косвенные расходы', type:'pct', min:0, max:5, step:0.1, def:1},
+ {key:'gdLowPct', label:'% ГД при выручке ≤ порога', group:'Косвенные расходы', type:'pct', min:0, max:10, step:0.5, def:3},
+ {key:'gdHighPct', label:'% ГД при выручке > порога', group:'Косвенные расходы', type:'pct', min:0, max:10, step:0.5, def:2},
+ {key:'gdThreshold', label:'Порог выручки для % ГД, ₽', group:'Косвенные расходы', type:'fixed', step:500000, def:10000000},
+ {key:'fotAupOtherFlat', label:'ФОТ АУП (клуб+ком.отдел+HR+финотдел+хаусмастер), ₽/мес', group:'Косвенные расходы', type:'fixed', step:50000, def:1514562},
+ {key:'podbor', label:'Подбор и обучение персонала, ₽/мес', group:'Косвенные расходы', type:'fixed', step:5000, def:40000},
+ {key:'postoyannye', label:'Постоянные затраты (охрана, интернет и пр.), ₽/мес', group:'Косвенные расходы', type:'fixed', step:5000, def:125500},
+ {key:'obslujivanie', label:'Обслуживание (такси, ПО и пр.), ₽/мес', group:'Косвенные расходы', type:'fixed', step:10000, def:420000},
+ {key:'commPct', label:'Коммерческие расходы, % от выручки', group:'Косвенные расходы', type:'pct', min:10, max:35, step:0.5, def:20},
+
+ {key:'officialPayroll', label:'Официальная ЗП, ₽/мес', group:'Налоги', type:'fixed', step:10000, def:600000},
+ {key:'usnIpPct', label:'УСН ИП (с «вход»), %', group:'Налоги', type:'pct', min:0, max:15, step:0.5, def:8},
+ {key:'usnDrPct', label:'УСН Д-Р (с «бар»), %', group:'Налоги', type:'pct', min:0, max:15, step:0.5, def:3},
+ {key:'nalogVyvodPct', label:'Налог на вывод, %', group:'Налоги', type:'pct', min:0, max:25, step:0.5, def:10},
+ {key:'strahovyePct', label:'Страховые взносы, %', group:'Налоги', type:'pct', min:0, max:40, step:1, def:30},
+ {key:'ndflPct', label:'НДФЛ, %', group:'Налоги', type:'pct', min:0, max:20, step:0.5, def:13},
+
+ {key:'premiiPct', label:'Премии (от операционной прибыли), %', group:'Ниже операционной прибыли', type:'pct', min:0, max:10, step:0.5, def:3},
+ {key:'finMov', label:'Финансовые движения (займ), ₽/мес', group:'Ниже операционной прибыли', type:'fixed', step:10000, def:-200000}
+];
+const SCENARIO_KEYS = ['guestPct','checkPct','zakupPct','commPct']; // the only 4 that scenarios override
+
+function defaultAssumptions(){
+  const a = {};
+  PARAM_DEFS.forEach(p=> a[p.key] = p.type==='pct' ? p.def/100 : p.def);
+  a.opOn = true;
+  return a;
+}
+
+/* ============ FORMATTERS ============ */
+function fmtM(v){ return (v/1000000).toLocaleString('ru-RU',{minimumFractionDigits:1,maximumFractionDigits:1}) + ' млн ₽'; }
+function fmtFull(v){ return Math.round(v).toLocaleString('ru-RU') + ' ₽'; }
+function fmtInt(v){ return Math.round(v).toLocaleString('ru-RU'); }
+function pct(v,d=1){ return (v*100).toFixed(d) + '%'; }
+function signed(v,d=1){ const s = v>0?'+':''; return s + (v*100).toFixed(d) + '%'; }
+function signedNum(v){ const s = v>0?'+':''; return s + fmtInt(v); }
+
+/* ============ CALC ENGINE ============ */
+function monthData(i, a){
+  if(i < FACT_COUNT){
+    return {
+      guests:BASE.guests[i], check:BASE.check[i],
+      revenue:BASE.revenue[i], bar:BASE.bar[i], entrance:BASE.entrance[i],
+      cogs:BASE.cogs_total[i], gross:BASE.gross_profit[i], indirect:BASE.indirect_total[i],
+      pretax:BASE.pretax_profit[i], taxes:BASE.taxes_total[i], opProfit:BASE.operating_profit[i], netProfit:BASE.net_profit[i],
+      isFact:true
+    };
+  }
+  const guests = BASE.guests[i]*(1+a.guestPct);
+  const check = BASE.check[i]*(1+a.checkPct);
+  const revenue = guests*check;
+  const entrance = revenue*a.entrancePct;
+  const tables = a.opOn ? BASE.tables[i] : 0;
+  const events = a.opOn ? BASE.events[i] : 0;
+  const bar = revenue - entrance - tables - events;
+
+  const zakup = revenue*a.zakupPct;
+  const fotLineyka = BASE.fot_lineyka[i] * (1+a.fotLineykaPct);
+  const pctLineyka = bar*a.pctLineykaRate;
+  const commTables = tables*a.commTablesRate;
+  const commEvents = events*a.commEventsRate;
+  const cogs = zakup + fotLineyka + pctLineyka + commTables + commEvents + a.arenda + a.komunalka;
+  const gross = revenue - cogs;
+
+  const ekvayring = revenue*a.ekvayringPct;
+  const gd = revenue>a.gdThreshold ? revenue*a.gdHighPct : revenue*a.gdLowPct;
+  const kpi = revenue*a.kpiPct;
+  const fotAup = a.fotAupOtherFlat + gd + kpi;
+  const fondy = revenue*a.fondyPct;
+  const adminTotal = a.podbor + fondy;
+  const commercialTotal = revenue*a.commPct;
+  const indirect = a.postoyannye + a.obslujivanie + ekvayring + fotAup + adminTotal + commercialTotal;
+
+  const pretax = gross - indirect;
+
+  const usnIp = entrance*a.usnIpPct;
+  const usnDr = bar*a.usnDrPct;
+  const nalogVyvod = (fotAup+fotLineyka+pctLineyka-a.officialPayroll)*a.nalogVyvodPct;
+  const strahovye = a.officialPayroll*a.strahovyePct;
+  const ndfl = a.officialPayroll*a.ndflPct;
+  const taxes = usnIp+usnDr+nalogVyvod+strahovye+ndfl;
+
+  const opProfit = pretax - taxes;
+  const premii = opProfit*a.premiiPct;
+  const netProfit = opProfit - premii + a.finMov;
+
+  return {guests,check,revenue,bar,entrance,cogs,gross,indirect,pretax,taxes,opProfit,netProfit,isFact:false};
+}
+
+function annual(a){
+  const months = [];
+  for(let i=0;i<12;i++) months.push(monthData(i,a));
+  let cum = 0;
+  months.forEach(m=>{ cum += m.netProfit; m.cumBalance = cum; });
+  const sum = (key)=>months.reduce((acc,m)=>acc+m[key],0);
+  return {
+    months,
+    guestsTotal: sum('guests'), checkAvg: sum('check')/12,
+    revenue:sum('revenue'), cogs:sum('cogs'), gross:sum('gross'),
+    indirect:sum('indirect'), pretax:sum('pretax'), taxes:sum('taxes'),
+    opProfit:sum('opProfit'), netProfit:sum('netProfit'),
+    minCum: Math.min(...months.map(m=>m.cumBalance))
+  };
+}
+
+/* ============================================================
+   TAB 1 — independent calc engine ("Общий интерфейс").
+   Deliberately separate from PARAM_DEFS / monthData / annual
+   above, which power Tab 2 ("Сценарии") and must stay untouched.
+   ============================================================ */
+const PARAM_DEFS_T1 = [
+ {key:'entrancePct', label:'Доля «вход» от выручки', group:'Выручка', type:'pct', min:10, max:30, step:1, def:20},
+
+ {key:'zakupPct', label:'Закуп, % от выручки', group:'Себестоимость', type:'pct', min:15, max:35, step:0.5, def:20},
+ {key:'fotLineykaPct', label:'ФОТ «линейка» (бар-персонал), % к плану', group:'Себестоимость', type:'pct', min:-30, max:30, step:1, def:0},
+ {key:'pctLineykaRate', label:'% премии «линейки» от выручки бара', group:'Себестоимость', type:'pct', min:0, max:5, step:0.1, def:1},
+ {key:'arenda', label:'Аренда, ₽/мес', group:'Себестоимость', type:'fixed', step:10000, def:500000},
+ {key:'komunalka', label:'Коммуналка, ₽/мес', group:'Себестоимость', type:'fixed', step:5000, def:30000},
+ {key:'fotOp', label:'ФОТ ОП, ₽/мес', group:'Себестоимость', type:'fixed', step:10000, def:0},
+ {key:'commTablesRate', label:'% комиссии ОП со столов', group:'Себестоимость', type:'pct', min:0, max:10, step:0.5, def:2},
+ {key:'commEventsRate', label:'% комиссии ОП с мероприятий', group:'Себестоимость', type:'pct', min:0, max:15, step:0.5, def:5},
+
+ {key:'postoyannye', label:'Постоянные затраты, ₽/мес', group:'Косвенные расходы', type:'fixed', step:5000, def:125000},
+ {key:'taxi', label:'Такси, ₽/мес', group:'Косвенные расходы', type:'fixed', step:5000, def:130000},
+ {key:'po', label:'ПО, ₽/мес', group:'Косвенные расходы', type:'fixed', step:5000, def:90000},
+ {key:'vnebudget', label:'Внебюджетные, ₽/мес', group:'Косвенные расходы', type:'fixed', step:5000, def:200000},
+ {key:'ekvayringPct', label:'Эквайринг, % от выручки', group:'Косвенные расходы', type:'pct', min:0, max:5, step:0.1, def:2},
+
+ {key:'aupKlub', label:'АУП Клуба, ₽/мес', group:'ФОТ АУП', type:'fixed', step:10000, def:621000},
+ {key:'commerceDept', label:'Коммерческий отдел, ₽/мес', group:'ФОТ АУП', type:'fixed', step:10000, def:500000},
+ {key:'gdPct', label:'Генеральный директор, % от выручки', group:'ФОТ АУП', type:'pct', min:0, max:10, step:0.5, def:2},
+ {key:'finotdel', label:'Финансовый отдел, ₽/мес', group:'ФОТ АУП', type:'fixed', step:10000, def:400000},
+ {key:'housemaster', label:'Хаусмастер, ₽/мес', group:'ФОТ АУП', type:'fixed', step:5000, def:30000},
+ {key:'kpiPct', label:'Премии (KPI), % от выручки', group:'ФОТ АУП', type:'pct', min:0, max:5, step:0.1, def:1},
+
+ {key:'podbor', label:'Подбор персонала, ₽/мес', group:'Админ расходы', type:'fixed', step:5000, def:40000},
+ {key:'fondyPct', label:'Фонды, % от выручки', group:'Админ расходы', type:'pct', min:0, max:5, step:0.1, def:1.5},
+
+ {key:'commPct', label:'Коммерческие расходы, % от выручки', group:'Коммерческие расходы', type:'pct', min:10, max:35, step:0.5, def:20},
+
+ {key:'taxPct', label:'Налоги, % от выручки', group:'Налоги', type:'pct', min:0, max:20, step:0.5, def:7}
+];
+const GUEST_MONTHS_DEFAULT = BASE.guests.slice(FACT_COUNT); // Jun..Dec defaults, typed-in by user
+const CHECK_JUNE_DEFAULT = BASE.check[5];
+const CHECK_SEPT_DEFAULT = BASE.check[8];
+const CHECK_GROWTH_DEFAULT = 5; // %/month
+const DEC_HIKE = 0.10; // one-off price hike in December — fixed, not exposed (per ФМ)
+
+function defaultAssumptionsT1(){
+  const a = {};
+  PARAM_DEFS_T1.forEach(p=> a[p.key] = p.type==='pct' ? p.def/100 : p.def);
+  a.guestsByMonth = GUEST_MONTHS_DEFAULT.slice();
+  a.checkJune = CHECK_JUNE_DEFAULT;
+  a.checkSept = CHECK_SEPT_DEFAULT;
+  a.checkGrowthPct = CHECK_GROWTH_DEFAULT/100;
+  a.opOn = true;
+  return a;
+}
+
+function checkTrajectoryT1(a){
+  // returns check value per forecast month index (5..11)
+  const c = {};
+  c[5] = a.checkJune;
+  c[6] = c[5]*(1+a.checkGrowthPct);
+  c[7] = c[6]*(1+a.checkGrowthPct);
+  c[8] = a.checkSept;
+  c[9] = c[8]*(1+a.checkGrowthPct);
+  c[10] = c[9]*(1+a.checkGrowthPct);
+  c[11] = c[10]*(1+a.checkGrowthPct)*(1+DEC_HIKE);
+  return c;
+}
+
+function monthDataT1(i, a, checkTraj){
+  if(i < FACT_COUNT){
+    return {
+      guests:BASE.guests[i], check:BASE.check[i],
+      revenue:BASE.revenue[i], bar:BASE.bar[i], entrance:BASE.entrance[i],
+      cogs:BASE.cogs_total[i], gross:BASE.gross_profit[i],
+      zakup:Math.round(BASE.revenue[i]*0.20), fotLineyka:BASE.fot_lineyka[i],
+      postoyannye:BASE.fact_postoyannye[i], taxi:BASE.fact_taxi[i], po:BASE.fact_po[i], vnebudget:BASE.fact_vnebudget[i], ekvayring:BASE.fact_ekvayring[i],
+      aupKlub:BASE.fact_aupKlub[i], commerceDept:BASE.fact_commerceDept[i], gd:BASE.fact_gd[i], finotdel:BASE.fact_finotdel[i], housemaster:BASE.fact_housemaster[i], kpi:BASE.fact_kpi[i],
+      podbor:BASE.fact_podbor[i], fondy:BASE.fact_fondy[i], commercialTotal:BASE.fact_commercialTotal[i],
+      indirect:BASE.indirect_total[i],
+      taxes:BASE.taxes_total[i], opProfit:BASE.operating_profit[i],
+      isFact:true
+    };
+  }
+  const guests = a.guestsByMonth[i-FACT_COUNT];
+  const check = checkTraj[i];
+  const revenue = guests*check;
+  const entrance = revenue*a.entrancePct;
+  const tables = a.opOn ? BASE.tables[i] : 0;
+  const events = a.opOn ? BASE.events[i] : 0;
+  const bar = revenue - entrance - tables - events;
+
+  const zakup = revenue*a.zakupPct;
+  const fotLineyka = BASE.fot_lineyka[i] * (1+a.fotLineykaPct);
+  const pctLineyka = bar*a.pctLineykaRate;
+  const fotOp = a.opOn ? a.fotOp : 0;
+  const commTables = tables*a.commTablesRate;
+  const commEvents = events*a.commEventsRate;
+  const cogs = zakup + fotLineyka + pctLineyka + fotOp + commTables + commEvents + a.arenda + a.komunalka;
+  const gross = revenue - cogs;
+
+  const ekvayring = revenue*a.ekvayringPct;
+  const gd = revenue*a.gdPct;
+  const kpi = revenue*a.kpiPct;
+  const fondy = revenue*a.fondyPct;
+  const commercialTotal = revenue*a.commPct;
+  const indirect = a.postoyannye + a.taxi + a.po + a.vnebudget + ekvayring + (a.aupKlub+a.commerceDept+gd+a.finotdel+a.housemaster+kpi) + (a.podbor+fondy) + commercialTotal;
+
+  const taxes = revenue*a.taxPct;
+  const opProfit = revenue - cogs - indirect - taxes;
+
+  return {guests,check,revenue,bar,entrance,cogs,gross,
+    zakup,fotLineyka,
+    postoyannye:a.postoyannye, taxi:a.taxi, po:a.po, vnebudget:a.vnebudget, ekvayring,
+    aupKlub:a.aupKlub, commerceDept:a.commerceDept, gd, finotdel:a.finotdel, housemaster:a.housemaster, kpi,
+    podbor:a.podbor, fondy, commercialTotal,
+    indirect,taxes,opProfit,isFact:false};
+}
+
+function annualT1(a){
+  const checkTraj = checkTrajectoryT1(a);
+  const months = [];
+  for(let i=0;i<12;i++) months.push(monthDataT1(i,a,checkTraj));
+  const sum = (key)=>months.reduce((acc,m)=>acc+m[key],0);
+  return {
+    months,
+    guestsTotal: sum('guests'), checkAvg: sum('check')/12,
+    revenue:sum('revenue'), cogs:sum('cogs'), gross:sum('gross'),
+    indirect:sum('indirect'), taxes:sum('taxes'), opProfit:sum('opProfit')
+  };
+}
+
+/* ============================================================ */
+
+/* ============ TAB SWITCHING ============ */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+    if(btn.dataset.tab==='tab2') renderTab2();
+    if(btn.dataset.tab==='tab3') renderTab3();
+  });
+});
+
+/* ============ GLOBAL STATE ============ */
+let globalOpOn = true;
+const opSwitch = document.getElementById('opSwitch');
+const opPillHeader = document.getElementById('opPillHeader');
+opSwitch.addEventListener('click', ()=>{
+  globalOpOn = !globalOpOn;
+  opSwitch.classList.toggle('on', globalOpOn);
+  opPillHeader.classList.toggle('on', globalOpOn);
+  opPillHeader.classList.toggle('off', !globalOpOn);
+  opPillHeader.textContent = 'ОП: ' + (globalOpOn ? 'ВКЛ' : 'ВЫКЛ');
+  renderTab1(); renderTab2();
+});
+
+/* ============ BUILD TAB1 PARAM PANEL ============ */
+const GROUPS_ORDER_T1 = ['Себестоимость','Косвенные расходы','ФОТ АУП','Админ расходы','Коммерческие расходы','Налоги'];
+const paramGroupsEl = document.getElementById('paramGroups');
+const FORECAST_MONTH_LABELS = MONTHS.slice(FACT_COUNT);
+
+let panelHtml = `<details class="pgroup" open><summary>Выручка</summary>
+  <span class="month-grid-label">Гости по месяцам (июн–дек)</span>
+  <div class="month-grid" id="guestMonthGrid"></div>
+
+  <div class="anchor-row">
+    <div class="anchor-cell"><span class="mlbl">Чек, база июнь</span><input type="number" id="s_checkJune" step="10" value="${CHECK_JUNE_DEFAULT}"></div>
+    <div class="anchor-cell"><span class="mlbl">Чек, база сентябрь</span><input type="number" id="s_checkSept" step="10" value="${CHECK_SEPT_DEFAULT}"></div>
+  </div>
+  <div class="control">
+    <div class="row"><label>Прирост чека, %/мес</label><span class="val" id="v_checkGrowthPct">${signed(CHECK_GROWTH_DEFAULT/100,0)}</span></div>
+    <input type="range" id="s_checkGrowthPct" min="-10" max="15" step="0.5" value="${CHECK_GROWTH_DEFAULT}">
+  </div>`;
+PARAM_DEFS_T1.filter(p=>p.group==='Выручка').forEach(p=>{
+  panelHtml += `<div class="control">
+    <div class="row"><label>${p.label}</label><span class="val" id="v_${p.key}"></span></div>
+    <input type="range" id="s_${p.key}" min="${p.min}" max="${p.max}" step="${p.step}" value="${p.def}">
+  </div>`;
+});
+panelHtml += `</details>`;
+
+GROUPS_ORDER_T1.forEach(g=>{
+  panelHtml += `<details class="pgroup" open><summary>${g}</summary>`;
+  PARAM_DEFS_T1.filter(p=>p.group===g).forEach(p=>{
+    if(p.type==='pct'){
+      panelHtml += `<div class="control">
+        <div class="row"><label>${p.label}</label><span class="val" id="v_${p.key}"></span></div>
+        <input type="range" id="s_${p.key}" min="${p.min}" max="${p.max}" step="${p.step}" value="${p.def}">
+      </div>`;
+    } else {
+      panelHtml += `<div class="control">
+        <div class="row"><label>${p.label}</label></div>
+        <input type="number" id="s_${p.key}" step="${p.step}" value="${p.def}">
+      </div>`;
+    }
+  });
+  panelHtml += `</details>`;
+});
+paramGroupsEl.innerHTML = panelHtml;
+
+// guest month grid (built separately — not part of PARAM_DEFS_T1 generic loop)
+document.getElementById('guestMonthGrid').innerHTML = FORECAST_MONTH_LABELS.map((m,idx)=>
+  `<div class="month-cell"><span class="mlbl">${m}</span><input type="number" id="g_month_${idx}" step="50" value="${GUEST_MONTHS_DEFAULT[idx]}"></div>`
+).join('');
+FORECAST_MONTH_LABELS.forEach((m,idx)=> document.getElementById('g_month_'+idx).addEventListener('input', renderTab1));
+
+['s_checkJune','s_checkSept'].forEach(id=> document.getElementById(id).addEventListener('input', renderTab1));
+document.getElementById('s_checkGrowthPct').addEventListener('input', onParamChange);
+
+PARAM_DEFS_T1.forEach(p=>{
+  document.getElementById('s_'+p.key).addEventListener('input', onParamChange);
+});
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  PARAM_DEFS_T1.forEach(p=>{ document.getElementById('s_'+p.key).value = p.def; });
+  document.getElementById('s_checkJune').value = CHECK_JUNE_DEFAULT;
+  document.getElementById('s_checkSept').value = CHECK_SEPT_DEFAULT;
+  document.getElementById('s_checkGrowthPct').value = CHECK_GROWTH_DEFAULT;
+  FORECAST_MONTH_LABELS.forEach((m,idx)=> document.getElementById('g_month_'+idx).value = GUEST_MONTHS_DEFAULT[idx]);
+  onParamChange();
+});
+
+function readPanelAssumptionsT1(){
+  const a = {};
+  PARAM_DEFS_T1.forEach(p=>{
+    const raw = +document.getElementById('s_'+p.key).value;
+    a[p.key] = p.type==='pct' ? raw/100 : raw;
+  });
+  a.guestsByMonth = FORECAST_MONTH_LABELS.map((m,idx)=> +document.getElementById('g_month_'+idx).value);
+  a.checkJune = +document.getElementById('s_checkJune').value;
+  a.checkSept = +document.getElementById('s_checkSept').value;
+  a.checkGrowthPct = +document.getElementById('s_checkGrowthPct').value/100;
+  a.opOn = globalOpOn;
+  return a;
+}
+function onParamChange(){
+  PARAM_DEFS_T1.forEach(p=>{
+    if(p.type==='pct'){
+      const raw = +document.getElementById('s_'+p.key).value/100;
+      const el = document.getElementById('v_'+p.key);
+      el.textContent = (p.key==='fotLineykaPct') ? signed(raw,0) : pct(raw,1);
+      el.className = 'val' + (raw<0?' neg':'');
+    }
+  });
+  const cg = +document.getElementById('s_checkGrowthPct').value/100;
+  document.getElementById('v_checkGrowthPct').textContent = signed(cg,0);
+  renderTab1();
+}
+onParamChange(); // init labels
+
+/* ============ CHART TOOLTIP (Tab 1 only) ============ */
+const tooltipEl = document.getElementById('chartTooltip');
+function bindTooltips(containerEl){
+  containerEl.querySelectorAll('[data-tip]').forEach(el=>{
+    el.addEventListener('mouseenter', ()=>{ tooltipEl.innerHTML = el.getAttribute('data-tip'); tooltipEl.classList.add('show'); });
+    el.addEventListener('mousemove', (e)=>{
+      tooltipEl.style.left = Math.min(e.clientX+14, window.innerWidth-230) + 'px';
+      tooltipEl.style.top = Math.max(e.clientY-10, 8) + 'px';
+    });
+    el.addEventListener('mouseleave', ()=>{ tooltipEl.classList.remove('show'); });
+  });
+}
+
+/* ============ SVG CHART HELPERS (no external libraries) ============ */
+const COLORS = { gold:'#E3AE3F', teal:'#49B6A8', rose:'#E2587C', bar:'#E3AE3F', entrance:'#8678C9', tables:'#49B6A8', events:'#E2587C', line:'#F3EFFA', grid:'rgba(255,255,255,0.09)', axis:'#6F6587' };
+const SC_COLORS = { base:'#5FCB8B', moderate:'#E8C547', critical:'#E2587C' };
+
+function niceMax(v){
+  if(v<=0) return 1;
+  const mag = Math.pow(10, Math.floor(Math.log10(v)));
+  const norm = v/mag;
+  let n;
+  if(norm<=1) n=1; else if(norm<=2) n=2; else if(norm<=5) n=5; else n=10;
+  return n*mag;
+}
+
+function svgStackedBarWithLine(containerId, categories, stackSeries, lineValues){
+  const W=720,H=320, padL=58, padR=46, padT=14, padB=34;
+  const plotW = W-padL-padR, plotH = H-padT-padB;
+  const n = categories.length;
+  const totals = categories.map((_,i)=> stackSeries.reduce((s,ser)=>s+ser.values[i],0));
+  const maxV = niceMax(Math.max(...totals)*1.08);
+  const bw = plotW/n*0.62;
+  const gap = plotW/n;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  // gridlines + y labels (left, money)
+  for(let g=0; g<=4; g++){
+    const val = maxV*g/4;
+    const y = padT + plotH - (val/maxV)*plotH;
+    svg += `<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="${COLORS.grid}" stroke-width="1"/>`;
+    svg += `<text x="${padL-8}" y="${y+3}" text-anchor="end" font-size="9" fill="${COLORS.axis}" font-family="ui-monospace,monospace">${(val/1e6).toFixed(0)}М</text>`;
+  }
+  // right axis (margin %)
+  for(let g=0; g<=4; g++){
+    const pv = g*25;
+    const y = padT + plotH - (pv/100)*plotH;
+    svg += `<text x="${W-padR+8}" y="${y+3}" text-anchor="start" font-size="9" fill="${COLORS.axis}" font-family="ui-monospace,monospace">${pv}%</text>`;
+  }
+  // bars
+  categories.forEach((cat,i)=>{
+    let yCum = 0;
+    const x = padL + gap*i + (gap-bw)/2;
+    stackSeries.forEach(ser=>{
+      const val = ser.values[i];
+      const h = (val/maxV)*plotH;
+      const y = padT + plotH - (yCum+val)/maxV*plotH;
+      const tip = `<div class="tt-title">${cat}</div>${ser.label}: ${fmtInt(val)} ₽`;
+      svg += `<rect data-tip="${tip.replace(/"/g,'&quot;')}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(h,0).toFixed(1)}" fill="${ser.color}"/>`;
+      yCum += val;
+    });
+    svg += `<text x="${(x+bw/2).toFixed(1)}" y="${H-padB+16}" text-anchor="middle" font-size="9.5" fill="${COLORS.axis}" font-family="ui-monospace,monospace">${cat}</text>`;
+  });
+  // margin line
+  let pts = '';
+  categories.forEach((cat,i)=>{
+    const x = padL + gap*i + gap/2;
+    const y = padT + plotH - (lineValues[i]/100)*plotH;
+    pts += `${x.toFixed(1)},${y.toFixed(1)} `;
+  });
+  svg += `<polyline points="${pts}" fill="none" stroke="${COLORS.line}" stroke-width="2"/>`;
+  categories.forEach((cat,i)=>{
+    const x = padL + gap*i + gap/2;
+    const y = padT + plotH - (lineValues[i]/100)*plotH;
+    const tip = `<div class="tt-title">${cat}</div>Валовая маржа: ${lineValues[i].toFixed(1)}%`;
+    svg += `<circle data-tip="${tip.replace(/"/g,'&quot;')}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="${COLORS.line}" opacity="0"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.4" fill="${COLORS.line}" style="pointer-events:none"/>`;
+  });
+  svg += `</svg>`;
+  document.getElementById(containerId).innerHTML = svg;
+  bindTooltips(document.getElementById(containerId));
+}
+
+function svgGroupedBar(containerId, categories, series){
+  const W=720,H=300, padL=58, padR=20, padT=14, padB=34;
+  const plotW = W-padL-padR, plotH = H-padT-padB;
+  const n = categories.length;
+  const maxV = niceMax(Math.max(...series.flatMap(s=>s.values), 0)*1.1);
+  const minV = Math.min(0, Math.min(...series.flatMap(s=>s.values)));
+  const gap = plotW/n;
+  const groupW = gap*0.66;
+  const bw = groupW/series.length;
+  const zeroY = padT + plotH*(maxV/(maxV-minV));
+  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  for(let g=0; g<=4; g++){
+    const val = maxV*g/4;
+    const y = padT + plotH - (val-minV)/(maxV-minV)*plotH;
+    svg += `<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="${COLORS.grid}" stroke-width="1"/>`;
+    svg += `<text x="${padL-8}" y="${y+3}" text-anchor="end" font-size="9" fill="${COLORS.axis}" font-family="ui-monospace,monospace">${(val/1e6).toFixed(0)}М</text>`;
+  }
+  categories.forEach((cat,i)=>{
+    const gx = padL + gap*i + (gap-groupW)/2;
+    series.forEach((ser,si)=>{
+      const val = ser.values[i];
+      const y0 = padT + plotH - (Math.max(val,0)-minV)/(maxV-minV)*plotH;
+      const yBase = padT + plotH - (Math.max(0,minV)-minV)/(maxV-minV)*plotH;
+      const h = Math.abs((val/(maxV-minV))*plotH);
+      const x = gx + si*bw;
+      const y = val>=0 ? y0 : yBase;
+      const tip = `<div class="tt-title">${cat}</div>${ser.label}: ${fmtInt(val)} ₽`;
+      svg += `<rect data-tip="${tip.replace(/"/g,'&quot;')}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(bw*0.86).toFixed(1)}" height="${h.toFixed(1)}" fill="${ser.color}"/>`;
+    });
+    svg += `<text x="${(gx+groupW/2).toFixed(1)}" y="${H-padB+16}" text-anchor="middle" font-size="9.5" fill="${COLORS.axis}" font-family="ui-monospace,monospace">${cat}</text>`;
+  });
+  svg += `</svg>`;
+  document.getElementById(containerId).innerHTML = svg;
+  bindTooltips(document.getElementById(containerId));
+}
+
+function svgMultiLine(containerId, categories, series){
+  const W=720,H=300, padL=58, padR=20, padT=14, padB=34;
+  const plotW = W-padL-padR, plotH = H-padT-padB;
+  const n = categories.length;
+  const allVals = series.flatMap(s=>s.values);
+  const maxV = niceMax(Math.max(...allVals)*1.1);
+  const minV = Math.min(0, Math.min(...allVals)*1.1);
+  const gap = plotW/n;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  for(let g=0; g<=4; g++){
+    const val = minV + (maxV-minV)*g/4;
+    const y = padT + plotH - (val-minV)/(maxV-minV)*plotH;
+    svg += `<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="${COLORS.grid}" stroke-width="1"/>`;
+    svg += `<text x="${padL-8}" y="${y+3}" text-anchor="end" font-size="9" fill="${COLORS.axis}" font-family="ui-monospace,monospace">${(val/1e6).toFixed(0)}М</text>`;
+  }
+  categories.forEach((cat,i)=>{
+    const x = padL + gap*i + gap/2;
+    svg += `<text x="${x.toFixed(1)}" y="${H-padB+16}" text-anchor="middle" font-size="9.5" fill="${COLORS.axis}" font-family="ui-monospace,monospace">${cat}</text>`;
+  });
+  series.forEach(ser=>{
+    let pts='';
+    categories.forEach((cat,i)=>{
+      const x = padL + gap*i + gap/2;
+      const y = padT + plotH - (ser.values[i]-minV)/(maxV-minV)*plotH;
+      pts += `${x.toFixed(1)},${y.toFixed(1)} `;
+    });
+    svg += `<polyline points="${pts}" fill="none" stroke="${ser.color}" stroke-width="2.2"/>`;
+    categories.forEach((cat,i)=>{
+      const x = padL + gap*i + gap/2;
+      const y = padT + plotH - (ser.values[i]-minV)/(maxV-minV)*plotH;
+      svg += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.3" fill="${ser.color}"><title>${ser.label} ${cat}: ${fmtInt(ser.values[i])} ₽</title></circle>`;
+    });
+  });
+  svg += `</svg>`;
+  document.getElementById(containerId).innerHTML = svg;
+}
+
+function legendHtml(items){
+  return `<div class="legend-row">` + items.map(it=>`<span><span class="legend-dot" style="background:${it.color}"></span>${it.label}</span>`).join('') + `</div>`;
+}
+
+/* ============ RENDER TAB1 ============ */
+function renderTab1(){
+  const a = readPanelAssumptionsT1();
+  const data = annualT1(a);
+  const base = annualT1(defaultAssumptionsT1());
+
+  const kpis = [
+    {label:'Гостей за год', val: fmtInt(data.guestsTotal), delta: data.guestsTotal-base.guestsTotal, fmt:'int'},
+    {label:'Средний чек (за год)', val: fmtInt(data.checkAvg)+' ₽', delta: data.checkAvg-base.checkAvg, fmt:'int'},
+    {label:'Выручка, год', val: fmtM(data.revenue), delta: data.revenue-base.revenue, fmt:'money'},
+    {label:'Операционная прибыль', val: fmtM(data.opProfit), delta: data.opProfit-base.opProfit, fmt:'money'},
+    {label:'Операционная маржа', val: pct(data.opProfit/data.revenue), delta:(data.opProfit/data.revenue)-(base.opProfit/base.revenue), fmt:'pct'}
+  ];
+  document.getElementById('kpiRow').innerHTML = kpis.map(k=>{
+    let cls='flat', dtxt='= план';
+    const tiny = k.fmt==='pct' ? 0.0008 : (k.fmt==='int' ? 0.6 : 800);
+    if(Math.abs(k.delta) > tiny){
+      cls = k.delta>=0?'pos':'neg';
+      dtxt = k.fmt==='pct' ? signed(k.delta,1)+' к плану' : (k.fmt==='money' ? (k.delta>=0?'+':'')+fmtM(k.delta)+' к плану' : signedNum(k.delta)+' к плану');
+    }
+    return `<div class="kpi"><div class="eyebrow">${k.label}</div><div class="num">${k.val}</div><div class="delta ${cls}">${dtxt}</div></div>`;
+  }).join('');
+
+  try{
+    svgStackedBarWithLine('revenueChart', MONTHS,
+      [
+        {label:'Бар', color:COLORS.bar, values:data.months.map(m=>m.bar)},
+        {label:'Вход', color:COLORS.entrance, values:data.months.map(m=>m.entrance)},
+        {label:'Столы+мероприятия', color:COLORS.tables, values:data.months.map(m=> m.revenue-m.bar-m.entrance)}
+      ],
+      data.months.map(m=>m.gross/m.revenue*100)
+    );
+    svgGroupedBar('profitChart', MONTHS,
+      [
+        {label:'Валовая прибыль', color:COLORS.teal, values:data.months.map(m=>m.gross)},
+        {label:'Операционная прибыль', color:COLORS.gold, values:data.months.map(m=>m.opProfit)}
+      ]
+    );
+  } catch(e){ console.warn('chart skipped', e); }
+
+  const rows = [
+    {label:'Выручка', key:'revenue', total:true},
+    {label:'Себестоимость', key:'cogs'},
+    {label:'Валовая прибыль', key:'gross', total:true},
+    {label:'Валовая маржа, %', key:'grossM', isPct:true},
+
+    {label:'Постоянные затраты', key:'postoyannye', sub:true},
+    {label:'Такси', key:'taxi', sub:true},
+    {label:'ПО', key:'po', sub:true},
+    {label:'Внебюджетные', key:'vnebudget', sub:true},
+    {label:'Эквайринг', key:'ekvayring', sub:true},
+    {label:'Косвенные расходы (итого)', calc:m=>m.postoyannye+m.taxi+m.po+m.vnebudget+m.ekvayring, subtotal:true},
+
+    {label:'АУП Клуба', key:'aupKlub', sub:true},
+    {label:'Коммерческий отдел', key:'commerceDept', sub:true},
+    {label:'Генеральный директор', key:'gd', sub:true},
+    {label:'Финансовый отдел', key:'finotdel', sub:true},
+    {label:'Хаусмастер', key:'housemaster', sub:true},
+    {label:'Премии (KPI)', key:'kpi', sub:true},
+    {label:'ФОТ АУП (итого)', calc:m=>m.aupKlub+m.commerceDept+m.gd+m.finotdel+m.housemaster+m.kpi, subtotal:true},
+
+    {label:'Подбор персонала', key:'podbor', sub:true},
+    {label:'Фонды', key:'fondy', sub:true},
+    {label:'Админ расходы (итого)', calc:m=>m.podbor+m.fondy, subtotal:true},
+
+    {label:'Коммерческие расходы', key:'commercialTotal'},
+    {label:'ИТОГО косвенные+АУП+админ+коммерческие', calc:m=>m.indirect, subtotal:true, grand:true},
+
+    {label:'Налоги', key:'taxes'},
+    {label:'Операционная прибыль', key:'opProfit', total:true},
+    {label:'Операционная маржа, %', key:'opM', isPct:true}
+  ];
+  let html = '<thead><tr><th>Статья, тыс. ₽</th>' + MONTHS.map((m,i)=>{
+    const isFact = i<FACT_COUNT;
+    return `<th class="num ${isFact?'fact-col':'plan-col'}">${m}<br><span class="fact-badge ${isFact?'is-fact':'is-plan'}">${isFact?'факт':'план'}</span></th>`;
+  }).join('') + '<th class="num">Итого</th></tr></thead><tbody>';
+  rows.forEach(r=>{
+    const trCls = r.total ? 'group-total' : (r.subtotal ? 'group-total' : '');
+    html += `<tr class="${trCls}"><td>${r.sub ? '<span style="padding-left:16px; display:inline-block;">'+r.label+'</span>' : r.label}</td>`;
+    let tot = 0;
+    data.months.forEach((m,i)=>{
+      let v;
+      if(r.key==='grossM') v = m.gross/m.revenue;
+      else if(r.key==='opM') v = m.opProfit/m.revenue;
+      else if(r.calc) v = r.calc(m);
+      else v = m[r.key];
+      if(!r.isPct) tot += v;
+      const isFact = i<FACT_COUNT;
+      const cls = isFact?'fact-col':'plan-col';
+      const txtCls = r.sub ? 'style="color:var(--text-faint); font-size:11.5px;"' : '';
+      html += `<td class="num ${cls}" ${txtCls}>${r.isPct? pct(v,1) : fmtInt(v/1000)}</td>`;
+    });
+    html += `<td class="num">${r.isPct? '—' : fmtInt(tot/1000)}</td></tr>`;
+  });
+  html += '</tbody>';
+  document.getElementById('plTable').innerHTML = html;
+}
+
+/* ============ TAB 2 ============ */
+function scenarioAssumptions(driverOverrides){
+  const a = defaultAssumptions();
+  Object.assign(a, driverOverrides);
+  a.opOn = globalOpOn;
+  return a;
+}
+const scenarioDrivers = {
+  base:     {guestPct:0,     checkPct:0,     zakupPct:0.20, commPct:0.20},
+  moderate: {guestPct:-0.05, checkPct:-0.05, zakupPct:0.22, commPct:0.22},
+  critical: {guestPct:-0.15, checkPct:-0.12, zakupPct:0.26, commPct:0.26}
+};
+const scenarioMeta = {
+  base:{name:'Базовый', cls:'c-base', locked:true, chip:'= текущий план'},
+  moderate:{name:'Умеренное падение', cls:'c-moderate', locked:false, chip:'редактируется'},
+  critical:{name:'Критичное падение', cls:'c-critical', locked:false, chip:'ориентир, поправьте'}
+};
+
+function buildScenarioEditor(){
+  const sel = document.getElementById('scenarioSelect').value;
+  const meta = scenarioMeta[sel];
+  const drv = scenarioDrivers[sel];
+  const fields = [
+    {key:'guestPct', label:'Гости', min:-40, max:0, step:1},
+    {key:'checkPct', label:'Средний чек', min:-40, max:0, step:1},
+    {key:'zakupPct', label:'Закуп', min:20, max:35, step:0.5},
+    {key:'commPct', label:'Коммерческие расходы', min:20, max:35, step:0.5}
+  ];
+  let html = `<div class="scenario-card ${meta.cls}">
+    <div class="scenario-head"><span class="scenario-name">${meta.name}</span><span class="chip">${meta.chip}</span></div>
+    <div class="sc-grid">
+      <div>`;
+  fields.forEach(f=>{
+    const v = drv[f.key]*100;
+    const disabled = meta.locked ? 'disabled' : '';
+    html += `<div class="sc-control">
+      <div class="row"><label>${f.label}</label><span class="val" id="ev_${f.key}">${f.key.includes('Pct') && (f.key==='guestPct'||f.key==='checkPct') ? signed(drv[f.key],0) : pct(drv[f.key],1)}</span></div>
+      <input type="range" id="e_${f.key}" min="${f.min}" max="${f.max}" step="${f.step}" value="${v}" ${disabled}>
+    </div>`;
+  });
+  html += `${meta.locked?'<div class="locked-note">Базовый сценарий зафиксирован — это план из модели.</div>':''}</div>
+      <div class="sc-kpis" id="scKpis"></div>
+    </div>
+  </div>`;
+  document.getElementById('scenarioEditor').innerHTML = html;
+
+  fields.forEach(f=>{
+    const el = document.getElementById('e_'+f.key);
+    if(!meta.locked){
+      el.addEventListener('input', ()=>{
+        scenarioDrivers[sel][f.key] = +el.value/100;
+        const disp = (f.key==='guestPct'||f.key==='checkPct') ? signed(+el.value/100,0) : pct(+el.value/100,1);
+        document.getElementById('ev_'+f.key).textContent = disp;
+        renderTab2(true);
+      });
+    }
+  });
+  updateScenarioKpis(sel);
+}
+
+function updateScenarioKpis(sel){
+  const a = scenarioAssumptions(scenarioDrivers[sel]);
+  const base = scenarioAssumptions(scenarioDrivers.base);
+  const d = annual(a), b = annual(base);
+  const items = [
+    {label:'Гостей за год', val:fmtInt(d.guestsTotal), delta: sel==='base'? null : signedNum(d.guestsTotal-b.guestsTotal)},
+    {label:'Средний чек', val:fmtInt(d.checkAvg)+' ₽', delta: sel==='base'? null : signedNum(d.checkAvg-b.checkAvg)+' ₽'},
+    {label:'Выручка, год', val:fmtM(d.revenue), delta: sel==='base'? null : (d.revenue-b.revenue>=0?'+':'')+fmtM(d.revenue-b.revenue)},
+    {label:'Операционная прибыль', val:fmtM(d.opProfit), delta: sel==='base'? null : (d.opProfit-b.opProfit>=0?'+':'')+fmtM(d.opProfit-b.opProfit)}
+  ];
+  document.getElementById('scKpis').innerHTML = items.map(it=>`
+    <div class="sc-kpi"><div class="eyebrow">${it.label}</div><div class="num">${it.val}</div>${it.delta!==null?`<div class="sub">${it.delta} к базовому</div>`:''}</div>
+  `).join('');
+}
+
+document.getElementById('scenarioSelect').addEventListener('change', buildScenarioEditor);
+
+function renderTab2(skipEditor){
+  if(!skipEditor) buildScenarioEditor();
+  else updateScenarioKpis(document.getElementById('scenarioSelect').value);
+
+  const base = annual(scenarioAssumptions(scenarioDrivers.base));
+  const mod = annual(scenarioAssumptions(scenarioDrivers.moderate));
+  const crit = annual(scenarioAssumptions(scenarioDrivers.critical));
+
+  const rows = [
+    {label:'Гостей за год', key:'guestsTotal', isNum:true},
+    {label:'Средний чек', key:'checkAvg', isNum:true},
+    {label:'Выручка', key:'revenue'},
+    {label:'Себестоимость', key:'cogs'},
+    {label:'Валовая прибыль', key:'gross'},
+    {label:'Валовая маржа, %', key:'grossM', isPct:true},
+    {label:'Косвенные расходы', key:'indirect'},
+    {label:'Прибыль до налогообложения', key:'pretax'},
+    {label:'Налоги', key:'taxes'},
+    {label:'Операционная прибыль', key:'opProfit', total:true},
+    {label:'Операционная маржа, %', key:'opM', isPct:true}
+  ];
+  function val(d,key){
+    if(key==='grossM') return d.gross/d.revenue;
+    if(key==='opM') return d.opProfit/d.revenue;
+    return d[key];
+  }
+  let html = '<thead><tr><th>Показатель (итого 2026)</th><th class="num col-base">Базовый</th><th class="num col-moderate">Умеренный</th><th class="num col-critical">Критичный</th></tr></thead><tbody>';
+  rows.forEach(r=>{
+    const b=val(base,r.key), m=val(mod,r.key), c=val(crit,r.key);
+    html += `<tr class="${r.total?'group-total':''}"><td>${r.label}</td>`;
+    [b,m,c].forEach((v,idx)=>{
+      const cls = ['col-base','col-moderate','col-critical'][idx];
+      if(r.isPct){ html += `<td class="num ${cls}">${pct(v,1)}</td>`; }
+      else if(r.isNum){ html += `<td class="num ${cls}">${fmtInt(v)}${idx>0?` <span style="font-size:10px;color:var(--text-faint)">(${signed((v-b)/Math.abs(b),0)})</span>`:''}</td>`; }
+      else {
+        const dStr = idx>0 ? ` <span style="font-size:10px;color:var(--text-faint)">(${signed((v-b)/Math.abs(b),0)})</span>` : '';
+        html += `<td class="num ${cls}">${fmtM(v)}${dStr}</td>`;
+      }
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  document.getElementById('compareTable').innerHTML = html;
+
+  try{
+    svgMultiLine('scenarioRevChart', MONTHS, [
+      {label:'Базовый', color:SC_COLORS.base, values:base.months.map(m=>m.revenue)},
+      {label:'Умеренный', color:SC_COLORS.moderate, values:mod.months.map(m=>m.revenue)},
+      {label:'Критичный', color:SC_COLORS.critical, values:crit.months.map(m=>m.revenue)}
+    ]);
+    document.getElementById('scenarioRevChart').insertAdjacentHTML('beforeend', legendHtml([{label:'Базовый',color:SC_COLORS.base},{label:'Умеренный',color:SC_COLORS.moderate},{label:'Критичный',color:SC_COLORS.critical}]));
+
+    svgMultiLine('scenarioOpChart', MONTHS, [
+      {label:'Базовый', color:SC_COLORS.base, values:base.months.map(m=>m.opProfit)},
+      {label:'Умеренный', color:SC_COLORS.moderate, values:mod.months.map(m=>m.opProfit)},
+      {label:'Критичный', color:SC_COLORS.critical, values:crit.months.map(m=>m.opProfit)}
+    ]);
+    document.getElementById('scenarioOpChart').insertAdjacentHTML('beforeend', legendHtml([{label:'Базовый',color:SC_COLORS.base},{label:'Умеренный',color:SC_COLORS.moderate},{label:'Критичный',color:SC_COLORS.critical}]));
+  } catch(e){ console.warn('chart skipped', e); }
+}
+
+renderTab1();
+
+/* ============================================================
+   TAB 3 — "2025 vs 2026" comparison (read-only view, no inputs
+   of its own; 2026 side reads live from Tab 1's current panel).
+   ============================================================ */
+const BASE_2025 = {"revenue": [6543908, 5588790, 6186496, 6413890, 11869545, 11101994, 12201234, 14132271, 8421450, 9716540, 10238744, 11556186], "check": [1643, 1825, 1727, 1983, 1546, 1936, 2576, 2311, 2067, 1515, 1667, 1932], "guests": [3982, 3062, 3583, 3234, 7677, 5735, 5590, 6115, 3401, 4984, 6141, 5983], "fot": [1353999, 811103, 862203, 970676, 1473413, 1308840, 1384099, 1646603, 1134971, 1179494, 1432563, 1703753], "aup": [470000, 432997, 410547, 466300, 578894, 477700, 568999, 578290, 435083, 450999, 573300, 727498], "postoyannye": [452620, 480919, 479289, 519731, 611765, 611557, 583116, 636974, 660825, 686012, 608423, 673498], "obsluzhivanie": [266099, 213521, 250912, 282900, 349919, 496667, 511910, 597857, 592910, 394345, 415851, 676347], "nalogi": [446939, 346381, 343014, 429958, 730631, 645317, 582771, 663559, 464925, 627518, 631270, 733797], "administrativnye": [99031, 314840, 328000, 324562, 391028, 450500, 496000, 366779, 320120, 320000, 320000, 370000], "marketing": [1447328, 1362719, 1873467, 1581734, 2836057, 2490293, 2886188, 3236769, 1869409, 1674080, 2803620, 3007186], "zakup": [1523397, 1399941, 1402864, 1307367, 2307176, 2638930, 1942615, 2467074, 1450711, 1787164, 1739195, 1891437], "op_profit": [806858, 537532, 517144, 862656, 2917661, 2224215, 3531778, 4194055, 1744595, 2810187, 2051522, 2222817]};
+const SC2_COLORS = { y2025:'#7C8DB5', y2026:'#E3AE3F' };
+
+function renderTab3(){
+  const a = readPanelAssumptionsT1();
+  const d26 = annualT1(a);
+
+  const rev25 = BASE_2025.revenue.reduce((s,v)=>s+v,0);
+  const op25 = BASE_2025.op_profit.reduce((s,v)=>s+v,0);
+  const guests25 = BASE_2025.guests.reduce((s,v)=>s+v,0);
+  const check25avg = BASE_2025.check.reduce((s,v)=>s+v,0)/12;
+
+  const kpis = [
+    {label:'Выручка, год', v25: fmtM(rev25), v26: fmtM(d26.revenue), delta: (d26.revenue-rev25)/rev25},
+    {label:'Гостей за год', v25: fmtInt(guests25), v26: fmtInt(d26.guestsTotal), delta: (d26.guestsTotal-guests25)/guests25},
+    {label:'Средний чек', v25: fmtInt(check25avg)+' ₽', v26: fmtInt(d26.checkAvg)+' ₽', delta: (d26.checkAvg-check25avg)/check25avg},
+    {label:'Операционная прибыль', v25: fmtM(op25), v26: fmtM(d26.opProfit), delta: (d26.opProfit-op25)/op25},
+    {label:'Операционная маржа', v25: pct(op25/rev25), v26: pct(d26.opProfit/d26.revenue), delta: (d26.opProfit/d26.revenue)-(op25/rev25)}
+  ];
+  document.getElementById('kpiRow3').innerHTML = kpis.map(k=>{
+    const cls = k.delta>=0?'pos':'neg';
+    return `<div class="kpi"><div class="eyebrow">${k.label}</div><div class="num">${k.v26}</div><div class="delta ${cls}">${signed(k.delta,1)} vs 2025 (${k.v25})</div></div>`;
+  }).join('');
+
+  try{
+    svgGroupedBar('revCompareChart', MONTHS, [
+      {label:'2025 факт', color:SC2_COLORS.y2025, values:BASE_2025.revenue},
+      {label:'2026', color:SC2_COLORS.y2026, values:d26.months.map(m=>m.revenue)}
+    ]);
+    document.getElementById('revCompareLegend').innerHTML = legendHtml([{label:'2025 факт',color:SC2_COLORS.y2025},{label:'2026',color:SC2_COLORS.y2026}]).replace(/<div class="legend-row">|<\/div>$/g,'');
+
+    svgGroupedBar('opCompareChart', MONTHS, [
+      {label:'2025 факт', color:SC2_COLORS.y2025, values:BASE_2025.op_profit},
+      {label:'2026', color:SC2_COLORS.y2026, values:d26.months.map(m=>m.opProfit)}
+    ]);
+    document.getElementById('opCompareLegend').innerHTML = legendHtml([{label:'2025 факт',color:SC2_COLORS.y2025},{label:'2026',color:SC2_COLORS.y2026}]).replace(/<div class="legend-row">|<\/div>$/g,'');
+  } catch(e){ console.warn('chart skipped', e); }
+
+  // category comparison — mapped to comparable buckets
+  const sum26 = (key)=> d26.months.reduce((s,m)=>s+m[key],0);
+  const cats = [
+    {label:'Выручка', v25: rev25, v26: d26.revenue},
+    {label:'Закуп', v25: BASE_2025.zakup.reduce((s,v)=>s+v,0), v26: sum26('zakup')},
+    {label:'ФОТ (линейный персонал + АУП)', v25: BASE_2025.fot.reduce((s,v)=>s+v,0)+BASE_2025.aup.reduce((s,v)=>s+v,0), v26: sum26('fotLineyka')+sum26('aupKlub')+sum26('commerceDept')+sum26('gd')+sum26('finotdel')+sum26('housemaster')+sum26('kpi')},
+    {label:'Постоянные + обслуживание', v25: BASE_2025.postoyannye.reduce((s,v)=>s+v,0)+BASE_2025.obsluzhivanie.reduce((s,v)=>s+v,0), v26: sum26('postoyannye')+sum26('taxi')+sum26('po')+sum26('vnebudget')+sum26('ekvayring')},
+    {label:'Административные', v25: BASE_2025.administrativnye.reduce((s,v)=>s+v,0), v26: sum26('podbor')+sum26('fondy')},
+    {label:'Маркетинг / Коммерческие', v25: BASE_2025.marketing.reduce((s,v)=>s+v,0), v26: sum26('commercialTotal')},
+    {label:'Налоги', v25: BASE_2025.nalogi.reduce((s,v)=>s+v,0), v26: d26.taxes},
+    {label:'Операционная прибыль', v25: op25, v26: d26.opProfit, total:true}
+  ];
+  let html = `<thead><tr><th>Статья (итого за год)</th><th class="num" style="color:${SC2_COLORS.y2025}">2025 факт</th><th class="num" style="color:${SC2_COLORS.y2026}">2026</th><th class="num">Δ</th></tr></thead><tbody>`;
+  cats.forEach(c=>{
+    const d = (c.v26-c.v25)/Math.abs(c.v25);
+    const p25 = c.v25/rev25, p26 = c.v26/d26.revenue;
+    html += `<tr class="${c.total?'group-total':''}"><td>${c.label}</td>
+      <td class="num" style="color:${SC2_COLORS.y2025}">${fmtM(c.v25)}<br><span style="font-size:10px;color:var(--text-faint);font-weight:400;">${pct(p25,1)} от ТО</span></td>
+      <td class="num" style="color:${SC2_COLORS.y2026}">${fmtM(c.v26)}<br><span style="font-size:10px;color:var(--text-faint);font-weight:400;">${pct(p26,1)} от ТО</span></td>
+      <td class="num" style="color:${d>=0?'var(--green)':'var(--rose)'}">${signed(d,0)}</td></tr>`;
+  });
+  html += '</tbody>';
+  document.getElementById('year2525Table').innerHTML = html;
+}
+</script>
+</body>
+</html>
